@@ -3,7 +3,6 @@
 <head>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Plywood Quote 0.5mm</title>
 
 <style>
@@ -12,85 +11,98 @@ body{
 font-family:Arial;
 max-width:390px;
 margin:auto;
-padding:15px;
+padding:10px;
 }
 
 h2{
 text-align:center;
+font-size:20px;
+margin-bottom:10px;
+}
+
+label{
+font-size:14px;
 }
 
 input{
+
 width:100%;
-padding:10px;
-margin:6px 0;
-font-size:16px;
+height:30px;
+
+padding:4px 6px;
+
+margin-bottom:6px;
+
+font-size:14px;
+
 box-sizing:border-box;
+
 }
 
-.output{
+.result{
+font-size:15px;
+margin-top:4px;
 font-weight:bold;
-margin:6px 0;
 }
 
-.blue{
-color:blue;
-}
-
-.red{
-color:red;
-}
+.blue{color:blue;}
+.red{color:red;}
 
 </style>
 
 </head>
 
-
 <body>
 
 <h2>Plywood Quote 0.5mm</h2>
 
-<b>Thickness (mm)</b>
+<label>Thickness (mm)</label>
 <input id="thickness">
 
-<b>Bundles</b>
+<label>Bundles</label>
 <input id="bundles">
 
-<b>PCS / Bundle</b>
+<label>PCS / Bundle</label>
 <input id="pcsBundle">
 
-<b>EXW / PCS (USD)</b>
+<label>EXW / PCS (VND)</label>
 <input id="exwPcs">
 
-<b>EXW / CBM Buying (USD)</b>
+<label>EXW / CBM (VND)</label>
 <input id="exwCbm">
 
-<b>USD Rate</b>
-<input id="rate">
+<label>Logistics (VND)</label>
+<input id="logistics">
 
-<b>CFR Price (USD)</b>
+<label>CFR Price (VND)</label>
 <input id="cfr">
 
 <hr>
 
-<div class="output">CBM Buy: <span id="cbmBuy"></span></div>
-<div class="output">CBM Sell: <span id="cbmSell"></span></div>
-<div class="output">CBM Diff: <span id="cbmDiff"></span></div>
+<div class="result">CBM Buy: <span id="cbmBuy"></span></div>
+<div class="result">CBM Sell: <span id="cbmSell"></span></div>
+<div class="result">CBM Diff: <span id="cbmDiff"></span></div>
 
-<div class="output">Profits / CBM: <span id="profitCbm"></span></div>
-<div class="output">Profits Total: <span id="profitTotal"></span></div>
-
+<div class="result">Profit / CBM: <span id="profitCbm"></span></div>
+<div class="result">Profit Total: <span id="profitTotal"></span></div>
 
 <script>
 
 const width=1220
 const length=2440
 
-function val(id){
-return Number(document.getElementById(id).value.replace(/,/g,''))||0
+function num(id){
+
+let v=document.getElementById(id).value.replace(/,/g,'')
+
+return Number(v)||0
+
 }
 
 function format(x){
+
 return Number(x).toLocaleString()
+
 }
 
 document.querySelectorAll("input").forEach(i=>{
@@ -99,16 +111,15 @@ i.addEventListener("input",calc)
 
 function calc(){
 
-let thickness=val("thickness")
-let bundles=val("bundles")
-let pcsBundle=val("pcsBundle")
+let thickness=num("thickness")
+let bundles=num("bundles")
+let pcsBundle=num("pcsBundle")
 
-let exwPcs=val("exwPcs")
-let exwCbm=val("exwCbm")
+let exwPcs=num("exwPcs")
+let exwCbm=num("exwCbm")
 
-let rate=val("rate")
-let cfr=val("cfr")
-
+let logistics=num("logistics")
+let cfr=num("cfr")
 
 let pcs=bundles*pcsBundle
 
@@ -122,27 +133,32 @@ let cbmSell=pcs*(width/1000)*(length/1000)*(thSell/1000)
 let cbmDiff=cbmSell-cbmBuy
 
 
-let costUSD=0
+let cost=0
 
 if(exwPcs>0){
-costUSD=pcs*exwPcs
+
+cost=pcs*exwPcs
+
+}else{
+
+cost=cbmBuy*exwCbm
+
 }
-else{
-costUSD=cbmBuy*exwCbm
-}
 
-let cost=costUSD*rate
+cost=cost+logistics
 
-let sell=cfr*rate
 
-let profit=sell-cost
+let profit=cfr-cost
 
 let profitCbm=profit/cbmSell
 
 
 document.getElementById("cbmBuy").innerText=format(cbmBuy.toFixed(2))
+
 document.getElementById("cbmSell").innerText=format(cbmSell.toFixed(2))
+
 document.getElementById("cbmDiff").innerText=format(cbmDiff.toFixed(2))
+
 
 let pt=document.getElementById("profitTotal")
 let pc=document.getElementById("profitCbm")
@@ -150,19 +166,35 @@ let pc=document.getElementById("profitCbm")
 pt.innerText=format(Math.round(profit))
 pc.innerText=format(Math.round(profitCbm))
 
+
 if(profit>=0){
-pt.className="output blue"
-pc.className="output blue"
+
+pt.className="result blue"
+pc.className="result blue"
+
+}else{
+
+pt.className="result red"
+pc.className="result red"
+
 }
-else{
-pt.className="output red"
-pc.className="output red"
+
+
+document.querySelectorAll("input").forEach(i=>{
+
+let v=i.value.replace(/,/g,'')
+
+if(v!=""){
+
+i.value=format(v)
+
 }
+
+})
 
 }
 
 </script>
 
 </body>
-
 </html>
